@@ -31,4 +31,4 @@ pub use linux::OSImpl;
 #[cfg(target_os = "macos")]
 mod macos;
 #[cfg(target_os = "macos")]
-pub use macos::OSImpl;
+pub use macos::{OSImpl, hide_dock_icon};
