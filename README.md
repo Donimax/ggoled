@@ -15,8 +15,8 @@ This also showcases the burn-in you will get if not careful with OLEDs. The flic
 
 ## Supported Devices
 
-| Device                                      | Supported                                             |
-| ------------------------------------------- | ----------------------------------------------------- |
+| Device                                      | Supported                                            |
+| ------------------------------------------- | ---------------------------------------------------- |
 | SteelSeries Arctis Nova Pro Wired           | ✅                                                    |
 | SteelSeries Arctis Nova Pro Wired (Xbox)    | ✅                                                    |
 | SteelSeries Arctis Nova Pro Wireless        | ✅                                                    |
@@ -96,11 +96,54 @@ systemctl --user daemon-reload
 systemctl --user enable --now ggoled_app.service
 ```
 
+### macOS autostart (LaunchAgent)
+
+Create `~/Library/LaunchAgents/com.user.ggoled_app.plist`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.user.ggoled_app</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/path/to/ggoled_app</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/tmp/ggoled_app.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/ggoled_app.err</string>
+</dict>
+</plist>
+```
+
+Replace `/path/to/ggoled_app` with the absolute path to the binary (e.g. `~/.cargo/bin/ggoled_app` if installed via `cargo install`). Note: launchd does not expand `~`, use the full path like `/Users/yourusername/.cargo/bin/ggoled_app`.
+
+Load it:
+
+```sh
+launchctl load ~/Library/LaunchAgents/com.user.ggoled_app.plist
+```
+
+Other useful commands:
+
+```sh
+launchctl unload ~/Library/LaunchAgents/com.user.ggoled_app.plist  # stop and disable
+launchctl stop com.user.ggoled_app   # stop once
+launchctl start com.user.ggoled_app  # start manually
+```
+
 ### Custom font
 
 It's recommended to use bitmap fonts to avoid weird artifacting, but any TTF or OTF font should work.
 
-Modify the config file (`%appdata%\ggoled_app.toml` on Windows, `~/.config/ggoled_app.toml` on Linux) and add:
+Modify the config file (`%appdata%\ggoled_app.toml` on Windows, `~/.config/ggoled_app.toml` on Linux and macOS) and add:
 
 ```toml
 [font]
