@@ -15,8 +15,8 @@ This also showcases the burn-in you will get if not careful with OLEDs. The flic
 
 ## Supported Devices
 
-| Device                                      | Supported                                            |
-| ------------------------------------------- | ---------------------------------------------------- |
+| Device                                      | Supported                                             |
+| ------------------------------------------- | ----------------------------------------------------- |
 | SteelSeries Arctis Nova Pro Wired           | ✅                                                    |
 | SteelSeries Arctis Nova Pro Wired (Xbox)    | ✅                                                    |
 | SteelSeries Arctis Nova Pro Wireless        | ✅                                                    |
@@ -114,7 +114,10 @@ Create `~/Library/LaunchAgents/com.user.ggoled_app.plist`:
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
-    <true/>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
     <key>StandardOutPath</key>
     <string>/tmp/ggoled_app.log</string>
     <key>StandardErrorPath</key>
@@ -128,22 +131,21 @@ Replace `/path/to/ggoled_app` with the absolute path to the binary (e.g. `~/.car
 Load it:
 
 ```sh
-launchctl load ~/Library/LaunchAgents/com.user.ggoled_app.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.user.ggoled_app.plist
 ```
 
 Other useful commands:
 
 ```sh
-launchctl unload ~/Library/LaunchAgents/com.user.ggoled_app.plist  # stop and disable
-launchctl stop com.user.ggoled_app   # stop once
-launchctl start com.user.ggoled_app  # start manually
+launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.user.ggoled_app.plist  # stop and disable
+launchctl kickstart gui/$(id -u)/com.user.ggoled_app  # start manually
 ```
 
 ### Custom font
 
 It's recommended to use bitmap fonts to avoid weird artifacting, but any TTF or OTF font should work.
 
-Modify the config file (`%appdata%\ggoled_app.toml` on Windows, `~/.config/ggoled_app.toml` on Linux and macOS) and add:
+Modify the config file (`%appdata%\ggoled_app.toml` on Windows, `~/.config/ggoled_app.toml` on Linux, `~/Library/Application Support/ggoled_app.toml` on macOS) and add:
 
 ```toml
 [font]
