@@ -231,7 +231,29 @@ impl<T: Copy + PartialEq> RadioMenu<T> {
     }
 }
 
+// Hold an exclusive lock for the lifetime of the app so only one instance drives the device.
+// Retries briefly so a restart doesn't race the previous instance's shutdown.
+fn single_instance_lock() -> Option<std::fs::File> {
+    let path = Config::path().with_extension("lock");
+    if let Some(dir) = path.parent() {
+        let _ = std::fs::create_dir_all(dir);
+    }
+    let file = dialog_unwrap(std::fs::File::create(path));
+    for _ in 0..50 {
+        if file.try_lock().is_ok() {
+            return Some(file);
+        }
+        sleep(Duration::from_millis(100));
+    }
+    None
+}
+
 fn main() {
+    let Some(_instance_lock) = single_instance_lock() else {
+        eprintln!("ggoled_app is already running");
+        return;
+    };
+
     // Initial loading
     let mut config = Config::load();
     let mut os = OSImpl::new();
