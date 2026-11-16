@@ -238,9 +238,8 @@ fn main() {
 
     // Create tray icon with menu
     unsafe { sdl::SDL_SetHint(sdl::SDL_HINT_VIDEO_ALLOW_SCREENSAVER, c"1".as_ptr()) };
+    unsafe { sdl::SDL_SetHint(sdl::SDL_HINT_MAC_BACKGROUND_APP, c"1".as_ptr()) }; // no dock icon on macOS
     assert!(unsafe { sdl::SDL_Init(sdl::SDL_INIT_VIDEO) });
-    #[cfg(target_os = "macos")]
-    os::hide_dock_icon();
     let icon = Icon::load(include_bytes!("../assets/ggoled.png"));
     let icon_error = Icon::load(include_bytes!("../assets/ggoled_error.png"));
     let tray = unsafe { sdl::SDL_CreateTray(icon_error.surf, c"ggoled".as_ptr()) };
